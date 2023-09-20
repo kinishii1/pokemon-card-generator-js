@@ -20,51 +20,59 @@ const url = "https://pokeapi.co/api/v2/pokemon/";
 const card = document.getElementById("card");
 const btn = document.getElementById("btn");
 
+const renderCard = (data) => {
+  const hp = data.stats[0].base_stat;
+  const imgSrc = data.sprites.other.dream_world.front_default;
+  const pokeName = data.name[0].toUpperCase() + data.name.slice(1);
+  const statAttack = data.stats[1].base_stat;
+  const statDefense = data.stats[2].base_stat;
+  const statSpeed = data.stats[5].base_stat;
+  card.innerHTML = `
+    <p class="hp">
+      <span>HP</span>
+      ${hp}
+    </p>
+    <img src='${imgSrc}' />
+    <h2 class="poke-name">${pokeName}</h2>
+    <div class="types">
+    </div>
+    <div class="stats">
+      <div class='atk'>
+        <h3>${statAttack}</h3>
+        <p>Attack</p>
+      </div>
+      <div class='def'>
+        <h3>${statDefense}</h3>
+        <p>Defense</p>
+      </div>
+      <div class='speed'>
+        <h3>${statSpeed}</h3>
+        <p>Speed</p>
+      </div>
+    </div>`;
+};
+
+const setColorType = (data) => {
+  const typesDiv = document.querySelector('.types');
+  const dataTypes = data;
+  typesDiv.innerHTML = '';
+  card.style.background = `radial-gradient(circle at 50% 0%, ${typeColor[data[0].type.name]} 36%, #ffffff 60%)`;
+  dataTypes.forEach((type) => {
+    const spanType = document.createElement('span');
+    spanType.textContent = type.type.name;
+    spanType.style.backgroundColor = typeColor[type.type.name];
+    typesDiv.appendChild(spanType);
+  });
+};
+
 const getPokemon = () => {
   const randomPoke = Math.floor(Math.random() * 19) + 1;
   fetch(`${url}${randomPoke}`)
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
-      const hp = data.stats[0].base_stat;
-      const imgSrc = data.sprites.other.dream_world.front_default;
-      const pokeName = data.name[0].toUpperCase() + data.name.slice(1);
-      const statAttack = data.stats[1].base_stat;
-      const statDefense = data.stats[2].base_stat;
-      const statSpeed = data.stats[5].base_stat;
-      card.innerHTML = `
-      <p class="hp">
-        <span>HP</span>
-        ${hp}
-      </p>
-      <img src='${imgSrc}' />
-      <h2 class="poke-name">${pokeName}</h2>
-      <div class="types">
-      </div>
-      <div class="stats">
-        <div class='atk'>
-          <h3>${statAttack}</h3>
-          <p>Attack</p>
-        </div>
-        <div class='def'>
-          <h3>${statDefense}</h3>
-          <p>Defense</p>
-        </div>
-        <div class='speed'>
-          <h3>${statSpeed}</h3>
-          <p>Speed</p>
-        </div>
-      </div>`;
-      const typesDiv = document.querySelector('.types');
-      const dataTypes = data.types;
-      typesDiv.innerHTML = ''; // Clear previous types
-      dataTypes.forEach((type) => {
-        const spanType = document.createElement('span');
-        spanType.textContent = type.type.name;
-        spanType.style.backgroundColor = typeColor[type.type.name];
-        typesDiv.appendChild(spanType);
-        card.style.background = `radial-gradient(circle at 50% 0%, ${typeColor[type.type.name]} 36%, #ffffff 60%)`;
-      });
+      renderCard(data);
+      setColorType(data.types);
     });
 };
 
